@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Jogo dos Carboidratos</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      background: #f2f2f2;
+    }
+
+    h1 {
+      margin-top: 20px;
+    }
+
+    .container {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 30px;
+    }
+
+    .coluna {
+      width: 40%;
+    }
+
+    .item img {
+      width: 150px;
+      cursor: grab;
+      transition: transform 0.2s;
+    }
+
+    .item img:hover {
+      transform: scale(1.1);
+    }
+
+    .pessoa {
+      width: 200px;
+      height: 220px;
+      border: 2px dashed #aaa;
+      margin: 15px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      border-radius: 10px;
+      background: white;
+      transition: 0.3s;
+    }
+
+    .pessoa img {
+      width: 150px;
+      transition: 0.3s;
+    }
+
+    .drop-hover {
+      border: 2px solid green;
+      transform: scale(1.05);
+    }
+
+    .energia {
+      animation: pulse 0.5s;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    #mensagem {
+      font-size: 20px;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+
+</head>
+<body>
+
+<h1>Associe o alimento à necessidade</h1>
+
+<div class="container">
+
+  <!-- ALIMENTOS -->
+  <div class="coluna">
+    <h2>Alimentos</h2>
+
+    <div class="item" draggable="true" data-tipo="rapido">
+      <img src="imagens/acucar.png">
+    </div>
+
+    <div class="item" draggable="true" data-tipo="lento">
+      <img src="imagens/arroz.png">
+    </div>
+
+    <div class="item" draggable="true" data-tipo="resistente">
+      <img src="imagens/aveia.png">
+    </div>
+
+  </div>
+
+  <!-- PESSOAS -->
+  <div class="coluna">
+    <h2>Pessoas</h2>
+
+    <div class="pessoa" data-tipo="rapido" data-img="treino">
+      <img src="imagens/treino_fraco.png">
+      <p>Treino</p>
+    </div>
+
+    <div class="pessoa" data-tipo="lento" data-img="trabalho">
+      <img src="imagens/trabalho_fraco.png">
+      <p>Trabalho</p>
+    </div>
+
+    <div class="pessoa" data-tipo="resistente" data-img="cerebro">
+      <img src="imagens/cerebro_fraco.png">
+      <p>Estudo</p>
+    </div>
+
+  </div>
+
+</div>
+
+<p id="mensagem"></p>
+
+<script>
+let acertos = 0;
+let itemArrastado = null;
+
+let itens = document.querySelectorAll(".item");
+let pessoas = document.querySelectorAll(".pessoa");
+
+itens.forEach(item => {
+  item.addEventListener("dragstart", () => {
+    itemArrastado = item;
+  });
+});
+
+pessoas.forEach(pessoa => {
+
+  pessoa.addEventListener("dragover", e => {
+    e.preventDefault();
+    pessoa.classList.add("drop-hover");
+  });
+
+  pessoa.addEventListener("dragleave", () => {
+    pessoa.classList.remove("drop-hover");
+  });
+
+  pessoa.addEventListener("drop", () => {
+
+    pessoa.classList.remove("drop-hover");
+
+    let tipoPessoa = pessoa.getAttribute("data-tipo");
+    let tipoItem = itemArrastado.getAttribute("data-tipo");
+
+    if (tipoPessoa === tipoItem) {
+
+      // troca imagem para versão "forte"
+      let tipoImg = pessoa.getAttribute("data-img");
+      let img = pessoa.querySelector("img");
+
+      img.src = "imagens/" + tipoImg + "_forte.png";
+      img.classList.add("energia");
+
+      setTimeout(() => {
+        img.classList.remove("energia");
+      }, 500);
+
+      itemArrastado.remove();
+      acertos++;
+
+      if (acertos === 3) {
+        document.getElementById("mensagem").innerText = "🔥 Perfeito! Energia distribuída corretamente!";
+      }
+
+    } else {
+      document.getElementById("mensagem").innerText = "❌ Errou! Reiniciando...";
+      setTimeout(() => location.reload(), 1200);
+    }
+
+  });
+
+});
+</script>
+
+</body>
+</html>
